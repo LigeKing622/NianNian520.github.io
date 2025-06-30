@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我喜欢你 - NianNian520</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #ffe6f2;
+            flex-direction: column;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* 初始隐藏时间计数器 */
+        .time-counter {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #ff6699;
+            font-size: 1.2em;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 10px 15px;
+            border-radius: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            z-index: 10;
+            animation: fadeIn 1s ease-in-out forwards;
+            animation-delay: 5s; /* 信封动画结束后显示 */
+        }
+
+        /* 放大信封样式 */
+        .envelope-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeOut 1s ease-in-out forwards;
+            animation-delay: 5s; /* 延长信封显示时间 */
+        }
+
+        .envelope {
+            position: relative;
+            width: 400px;
+            height: 280px;
+            background-color: #f8d7da;
+            border-radius: 8px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            transform-style: preserve-3d;
+            transform-origin: center;
+            animation: envelopeFloat 3s ease-in-out infinite;
+        }
+
+        .envelope:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            width: 0;
+            height: 0;
+            border-left: 200px solid transparent;
+            border-right: 200px solid transparent;
+            border-top: 140px solid #e9a5b3;
+            transform-origin: top;
+            transform: rotateX(0deg);
+            z-index: 3;
+            animation: openEnvelope 3s ease-in-out forwards;
+            animation-delay: 1.5s;
+        }
+
+        .envelope-front {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: #f8d7da;
+            border-radius: 8px;
+            z-index: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .envelope-title {
+            font-size: 2em;
+            color: #ff3366;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .envelope-heart {
+            font-size: 3em;
+            color: #ff3366;
+            animation: heartbeat 2s infinite;
+        }
+
+        .letter {
+            position: absolute;
+            width: 90%;
+            height: 90%;
+            background-color: white;
+            border-radius: 8px;
+            top: 5%;
+            left: 5%;
+            z-index: 1;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            transform: translateY(100%);
+            opacity: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            animation: showLetter 2s ease-in-out forwards;
+            animation-delay: 3.5s;
+            padding: 25px;
+            box-sizing: border-box;
+        }
+
+        .letter-content {
+            font-size: 1.5em;
+            color: #333;
+            text-align: center;
+            line-height: 1.8;
+        }
+
+        @keyframes openEnvelope {
+            0% { transform: rotateX(0deg); }
+            70% { transform: rotateX(160deg); }
+            100% { transform: rotateX(180deg); }
+        }
+
+        @keyframes showLetter {
+            0% { transform: translateY(100%); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes envelopeFloat {
+            0% { transform: translateY(0px) rotate(-2deg); }
+            50% { transform: translateY(-15px) rotate(2deg); }
+            100% { transform: translateY(0px) rotate(-2deg); }
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; visibility: hidden; }
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        .main-content {
+            opacity: 0;
+            animation: fadeInMain 1.5s ease-in-out forwards;
+            animation-delay: 5s;
+        }
+
+        @keyframes fadeInMain {
+            0% { opacity: 0; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .text {
+            font-size: 3em;
+            color: #ff6699;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .heart-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 80%;
+            max-width: 800px;
+        }
+
+        .side-text {
+            width: 30%;
+            color: #ff3366;
+            font-size: 1.2em;
+            text-align: center;
+            line-height: 1.6;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .left-text {
+            text-align: right;
+            padding-right: 20px;
+        }
+
+        .right-text {
+            text-align: left;
+            padding-left: 20px;
+        }
+
+        .heart {
+            position: relative;
+            width: 100px;
+            height: 90px;
+            animation: heartbeat 1.5s infinite;
+            flex-shrink: 0;
+        }
+
+        .heart:before, .heart:after {
+            position: absolute;
+            content: "";
+            left: 50px;
+            top: 0;
+            width: 50px;
+            height: 80px;
+            background: #ff3366;
+            border-radius: 50px 50px 0 0;
+            transform: rotate(-45deg);
+            transform-origin: 0 100%;
+        }
+
+        .heart:after {
+            left: 0;
+            transform: rotate(45deg);
+            transform-origin: 100% 100%;
+        }
+
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.1); }
+            50% { transform: scale(1); }
+            75% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .hearts {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .floating-heart {
+            position: absolute;
+            opacity: 0;
+            font-size: 20px;
+            color: #ff3366;
+            animation: float 4s ease-in infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* 新增音乐播放器样式 - 带头像和歌名 */
+        .music-player {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 20px;
+            padding: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            opacity: 0;
+            animation: fadeIn 1s ease-in-out forwards;
+            animation-delay: 5s;
+            width: 280px;
+        }
+
+        .music-player:hover {
+            background-color: rgba(255, 255, 255, 0.95);
+            transform: scale(1.02);
+        }
+
+        .music-cover {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+            border: 2px solid #ff6699;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .music-info-container {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .music-title {
+            font-size: 14px;
+            color: #ff3366;
+            font-weight: bold;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 3px;
+        }
+
+        .music-artist {
+            font-size: 12px;
+            color: #ff8fab;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .music-controls {
+            display: flex;
+            align-items: center;
+            margin-top: 5px;
+        }
+
+        .play-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #ff3366;
+            cursor: pointer;
+            margin-right: 10px;
+            outline: none;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .play-btn:hover {
+            background-color: rgba(255, 51, 102, 0.1);
+        }
+
+        .progress-container {
+            flex: 1;
+            height: 4px;
+            background-color: #ffccdd;
+            border-radius: 2px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: #ff3366;
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.1s;
+        }
+
+        /* 旋转动画 */
+        .rotate {
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .music-player {
+                width: 90%;
+                left: 5%;
+                right: auto;
+                bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="time-counter" id="timeCounter"></div>
+
+<div class="envelope-container">
+    <div class="envelope">
+        <div class="envelope-front">
+            <div class="envelope-title">***的一封信</div>
+            <div class="envelope-heart">❤</div>
+        </div>
+        <div class="letter">
+            <div class="letter-content">
+                <p>亲爱的：</p>
+                <p>请查收我的心意</p>
+                <p>❤</p>
+                <p>愿这封信能传递</p>
+                <p>我内心最真挚的情感</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="main-content">
+    <div class="text">我喜欢你</div>
+
+    <div class="heart-container">
+        <div class="side-text left-text">
+            <p>自从遇见你的那一刻，</p>
+            <p>我的世界便有了色彩。</p>
+            <p>你的笑容如阳光般温暖，</p>
+            <p>照亮我生命的每一个角落。</p>
+        </div>
+
+        <div class="heart"></div>
+
+        <div class="side-text right-text">
+            <p>愿与你携手走过四季，</p>
+            <p>分享生活的点点滴滴。</p>
+            <p>你是我心中最美的风景，</p>
+            <p>此生只想与你共度。</p>
+        </div>
+    </div>
+</div>
+
+<!-- 新增音乐播放器 - 带头像和歌名 -->
+<div class="music-player" id="musicPlayer">
+    <img src="https://p2.music.126.net/4HGEnXVexEfBACKi2lHtXg==/109951165136904532.jpg" alt="专辑封面" class="music-cover" id="musicCover">
+    <div class="music-info-container">
+        <div class="music-title" id="musicTitle">浪漫告白</div>
+        <div class="music-artist" id="musicArtist">NianNian520</div>
+        <div class="music-controls">
+            <button class="play-btn" id="playBtn">▶</button>
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="hearts" id="hearts"></div>
+
+<script>
+    // 计算相遇天数
+    function calculateDaysTogether() {
+        const meetDate = new Date('2025-06-26');
+        const today = new Date();
+        const timeDiff = today - meetDate;
+        const daysTogether = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+
+        const counterElement = document.getElementById('timeCounter');
+        counterElement.textContent = `我们从2025年6月26日相见 目前已经坚持了${daysTogether}天`;
+    }
+
+    // 初始化计算天数
+    calculateDaysTogether();
+    // 每天更新一次
+    setInterval(calculateDaysTogether, 86400000);
+
+    // 创建漂浮的小爱心
+    function createHearts() {
+        const heartsContainer = document.getElementById('hearts');
+        const heart = document.createElement('div');
+        heart.innerHTML = '❤';
+        heart.classList.add('floating-heart');
+
+        // 随机位置
+        const left = Math.random() * 100;
+        const delay = Math.random() * 3;
+
+        heart.style.left = `${left}%`;
+        heart.style.bottom = '0';
+        heart.style.animationDelay = `${delay}s`;
+
+        heartsContainer.appendChild(heart);
+
+        // 动画结束后移除元素
+        setTimeout(() => {
+            heart.remove();
+        }, 4000);
+    }
+
+    // 每300毫秒创建一个新爱心
+    setInterval(createHearts, 300);
+
+    // 点击信封快速跳过动画
+    document.querySelector('.envelope-container').addEventListener('click', function() {
+        this.style.animation = 'fadeOut 0.5s ease-in-out forwards';
+        document.querySelector('.main-content').style.animation = 'fadeInMain 0.5s ease-in-out forwards';
+        document.querySelector('.time-counter').style.animation = 'fadeIn 0.5s ease-in-out forwards';
+        document.getElementById('musicPlayer').style.animation = 'fadeIn 0.5s ease-in-out forwards';
+    });
+
+    // 音乐播放器功能
+    document.addEventListener('DOMContentLoaded', function() {
+        const musicPlayer = document.getElementById('musicPlayer');
+        const playBtn = document.getElementById('playBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const musicTitle = document.getElementById('musicTitle');
+        const musicArtist = document.getElementById('musicArtist');
+        const musicCover = document.getElementById('musicCover');
+
+        // 创建音频元素
+        const audio = new Audio();
+        // 这里可以替换为您想要的音乐URL
+        audio.src = 'http://music.163.com/song/media/outer/url?id=1399112638.mp3'; // 示例音乐链接
+        audio.loop = true;
+
+        // 音乐信息
+        const songInfo = {
+            title: "心似烟火",
+            artist: "NianNian520",
+            cover: "https://tc.z.wiki/autoupload/xm_-rWxylbT20-hodgD_bxLsFZ1w1WKI39LF0VbAshSyl5f0KlZfm6UsKj-HyTuv/20250630/UIOk/940X940/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_2025-06-30_204434_459.jpg"
+        };
+
+        // 设置音乐信息
+        musicTitle.textContent = songInfo.title;
+        musicArtist.textContent = songInfo.artist;
+        musicCover.src = songInfo.cover;
+
+        // 更新进度条
+        audio.addEventListener('timeupdate', function() {
+            const progress = (audio.currentTime / audio.duration) * 100;
+            progressBar.style.width = `${progress}%`;
+        });
+
+        // 点击进度条跳转
+        progressContainer.addEventListener('click', function(e) {
+            const width = this.clientWidth;
+            const clickX = e.offsetX;
+            const duration = audio.duration;
+            audio.currentTime = (clickX / width) * duration;
+        });
+
+        // 播放/暂停按钮
+        playBtn.addEventListener('click', function() {
+            if (audio.paused) {
+                audio.play();
+                playBtn.textContent = '❚❚';
+                musicCover.classList.add('rotate');
+            } else {
+                audio.pause();
+                playBtn.textContent = '▶';
+                musicCover.classList.remove('rotate');
+            }
+        });
+
+        // 音乐加载后更新信息
+        audio.addEventListener('loadedmetadata', function() {
+            // 可以在这里获取更详细的音乐信息
+        });
+
+        // 音乐结束时重置进度条
+        audio.addEventListener('ended', function() {
+            progressBar.style.width = '0%';
+        });
+
+        // 鼠标悬停显示更多控制
+        musicPlayer.addEventListener('mouseenter', function() {
+            progressContainer.style.opacity = '1';
+        });
+
+        musicPlayer.addEventListener('mouseleave', function() {
+            progressContainer.style.opacity = '0.7';
+        });
+    });
+</script>
+</body>
+</html>
